@@ -22,15 +22,21 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
 
   if (!gig || !target || Number.isNaN(target.getTime())) {
     return (
-      <section className="border-y border-white/10 bg-black px-5 py-16">
+      <section
+        aria-labelledby="next-gig-heading"
+        className="border-y border-white/10 bg-black px-5 py-16"
+      >
         <div className="mx-auto max-w-6xl">
-          <p className="text-xs uppercase tracking-[0.22em] text-white/50">
+          <p className="text-xs uppercase tracking-[0.22em] text-white/70">
             Next gig
           </p>
-          <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl tracking-[0.06em] text-white sm:text-5xl">
+          <h2
+            id="next-gig-heading"
+            className="mt-4 font-[family-name:var(--font-display)] text-4xl tracking-[0.06em] text-white sm:text-5xl"
+          >
             Stay tuned
           </h2>
-          <p className="mt-4 max-w-xl text-white/65">
+          <p className="mt-4 max-w-xl text-white/80">
             No confirmed upcoming shows yet. Check back soon.
           </p>
         </div>
@@ -43,36 +49,52 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
   const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
   const minutes = Math.floor((diff / (1000 * 60)) % 60);
   const seconds = Math.floor((diff / 1000) % 60);
+  const place = formatGigPlace(gig);
 
   return (
-    <section className="border-y border-white/10 bg-zinc-950 px-5 py-16">
+    <section
+      aria-labelledby="next-gig-heading"
+      className="border-y border-white/10 bg-zinc-950 px-5 py-16"
+    >
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
         <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-white/50">
+          <p className="text-xs uppercase tracking-[0.22em] text-white/70">
             Next gig
           </p>
-          <h2 className="mt-4 font-[family-name:var(--font-display)] text-4xl tracking-[0.06em] text-white sm:text-6xl">
+          <h2
+            id="next-gig-heading"
+            className="mt-4 font-[family-name:var(--font-display)] text-4xl tracking-[0.06em] text-white sm:text-6xl"
+          >
             {gig.title}
           </h2>
-          <p className="mt-4 text-lg text-white/75">
-            {formatGigDate(gig.date)}
-            {gig.startTime ? ` · ${gig.startTime}` : ""}
+          <p className="mt-4 text-lg text-white/85">
+            <time dateTime={`${gig.date}T${gig.startTime || "19:00"}`}>
+              {formatGigDate(gig.date)}
+              {gig.startTime ? ` · ${gig.startTime}` : ""}
+            </time>
           </p>
-          <p className="mt-1 text-white/55">{formatGigPlace(gig)}</p>
+          <p className="mt-1 text-white/70">{place}</p>
           {gig.ticketLink ? (
             <TrackedLink
               href={gig.ticketLink}
               event="ticket_click"
               gigId={gig.id}
               gigTitle={gig.title}
-              className="mt-8 inline-flex border border-white bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-transparent hover:text-white"
+              aria-label={`Get tickets for ${gig.title} at ${place}`}
+              className="mt-8 inline-flex border border-white bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-transparent hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
               Get tickets
             </TrackedLink>
           ) : null}
         </div>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div
+          className="grid grid-cols-4 gap-3"
+          role="timer"
+          aria-live="polite"
+          aria-atomic="true"
+          aria-label={`Countdown to ${gig.title}: ${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`}
+        >
           {[
             ["Days", days],
             ["Hours", hours],
@@ -81,12 +103,18 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
           ].map(([label, value]) => (
             <div
               key={label as string}
-              className="border border-white/15 bg-black/40 px-3 py-4 text-center"
+              className="border border-white/20 bg-black/40 px-3 py-4 text-center"
             >
-              <div className="font-[family-name:var(--font-display)] text-3xl text-white sm:text-4xl">
+              <div
+                className="font-[family-name:var(--font-display)] text-3xl text-white sm:text-4xl"
+                aria-hidden="true"
+              >
                 {String(value).padStart(2, "0")}
               </div>
-              <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/45">
+              <div
+                className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/70"
+                aria-hidden="true"
+              >
                 {label}
               </div>
             </div>

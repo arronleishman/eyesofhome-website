@@ -1,3 +1,4 @@
+import { AboutSection } from "@/components/AboutSection";
 import { Hero } from "@/components/Hero";
 import { GigsSection } from "@/components/GigsSection";
 import { ListenSection } from "@/components/ListenSection";
@@ -5,6 +6,7 @@ import { NextGig } from "@/components/NextGig";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrackPageView } from "@/components/TrackPageView";
+import { siteConfig } from "@/lib/config";
 import {
   fetchPublicBand,
   spotifyArtistId,
@@ -29,22 +31,22 @@ export default async function HomePage() {
   }
 
   const nextGig = upcoming[0] ?? null;
-  const artistId = spotifyArtistId(socials?.spotify);
+  const spotifyUrl = socials?.spotify || siteConfig.spotifyUrl;
+  const instagramUrl = socials?.instagram || siteConfig.instagramUrl;
+  const artistId = spotifyArtistId(spotifyUrl);
 
   return (
     <>
       <TrackPageView />
       <SiteHeader />
-      <main>
+      <main id="main-content">
         <Hero />
         <NextGig gig={nextGig} />
         <GigsSection upcoming={upcoming} past={past} />
-        <ListenSection spotifyUrl={socials?.spotify} artistId={artistId} />
+        <ListenSection spotifyUrl={spotifyUrl} artistId={artistId} />
+        <AboutSection />
       </main>
-      <SiteFooter
-        instagramUrl={socials?.instagram}
-        spotifyUrl={socials?.spotify}
-      />
+      <SiteFooter instagramUrl={instagramUrl} spotifyUrl={spotifyUrl} />
     </>
   );
 }

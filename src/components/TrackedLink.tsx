@@ -15,6 +15,7 @@ type TrackedLinkProps = {
   gigId?: string;
   gigTitle?: string;
   external?: boolean;
+  "aria-label"?: string;
 };
 
 export function TrackedLink({
@@ -25,17 +26,23 @@ export function TrackedLink({
   gigId,
   gigTitle,
   external = true,
+  "aria-label": ariaLabel,
 }: TrackedLinkProps) {
   return (
     <a
       href={href}
       className={className}
+      aria-label={ariaLabel}
       {...(external
-        ? { target: "_blank", rel: "noopener noreferrer" }
+        ? {
+            target: "_blank",
+            rel: "noopener noreferrer",
+          }
         : undefined)}
       onClick={() => trackClientEvent(event, { gigId, gigTitle })}
     >
       {children}
+      {external ? <span className="sr-only"> (opens in a new tab)</span> : null}
     </a>
   );
 }
