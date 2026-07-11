@@ -24,7 +24,7 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
     return (
       <section
         aria-labelledby="next-gig-heading"
-        className="border-y border-white/10 bg-black px-5 py-16"
+        className="border-y border-white/10 bg-black px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
         <div className="mx-auto max-w-6xl">
           <p className="text-xs uppercase tracking-[0.22em] text-white/70">
@@ -32,11 +32,11 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
           </p>
           <h2
             id="next-gig-heading"
-            className="mt-4 font-[family-name:var(--font-display)] text-4xl tracking-[0.06em] text-white sm:text-5xl"
+            className="mt-3 font-[family-name:var(--font-display)] text-3xl tracking-[0.06em] text-white sm:mt-4 sm:text-5xl"
           >
             Stay tuned
           </h2>
-          <p className="mt-4 max-w-xl text-white/80">
+          <p className="mt-4 max-w-xl text-sm text-white/80 sm:text-base">
             No confirmed upcoming shows yet. Check back soon.
           </p>
         </div>
@@ -54,26 +54,26 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
   return (
     <section
       aria-labelledby="next-gig-heading"
-      className="border-y border-white/10 bg-zinc-950 px-5 py-16"
+      className="border-y border-white/10 bg-zinc-950 px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
     >
-      <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
-        <div>
+      <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1.15fr_1fr] md:items-end md:gap-10">
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.22em] text-white/70">
             Next gig
           </p>
           <h2
             id="next-gig-heading"
-            className="mt-4 font-[family-name:var(--font-display)] text-4xl tracking-[0.06em] text-white sm:text-6xl"
+            className="mt-3 break-words font-[family-name:var(--font-display)] text-3xl tracking-[0.06em] text-white sm:mt-4 sm:text-5xl lg:text-6xl"
           >
             {gig.title}
           </h2>
-          <p className="mt-4 text-lg text-white/85">
+          <p className="mt-3 text-base text-white/85 sm:mt-4 sm:text-lg">
             <time dateTime={`${gig.date}T${gig.startTime || "19:00"}`}>
               {formatGigDate(gig.date)}
               {gig.startTime ? ` · ${gig.startTime}` : ""}
             </time>
           </p>
-          <p className="mt-1 text-white/70">{place}</p>
+          <p className="mt-1 text-sm text-white/70 sm:text-base">{place}</p>
           {gig.ticketLink ? (
             <TrackedLink
               href={gig.ticketLink}
@@ -81,7 +81,7 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
               gigId={gig.id}
               gigTitle={gig.title}
               aria-label={`Get tickets for ${gig.title} at ${place}`}
-              className="mt-8 inline-flex border border-white bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-transparent hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center border border-white bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-transparent hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:mt-8 sm:w-auto"
             >
               Get tickets
             </TrackedLink>
@@ -89,7 +89,7 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
         </div>
 
         <div
-          className="grid grid-cols-4 gap-3"
+          className="grid grid-cols-4 gap-2 sm:gap-3"
           role="timer"
           aria-live="polite"
           aria-atomic="true"
@@ -103,16 +103,16 @@ export function NextGig({ gig }: { gig: StageRiseGig | null }) {
           ].map(([label, value]) => (
             <div
               key={label as string}
-              className="border border-white/20 bg-black/40 px-3 py-4 text-center"
+              className="border border-white/20 bg-black/40 px-1.5 py-3 text-center sm:px-3 sm:py-4"
             >
               <div
-                className="font-[family-name:var(--font-display)] text-3xl text-white sm:text-4xl"
+                className="font-[family-name:var(--font-display)] text-2xl text-white sm:text-3xl md:text-4xl"
                 aria-hidden="true"
               >
                 {String(value).padStart(2, "0")}
               </div>
               <div
-                className="mt-2 text-[10px] uppercase tracking-[0.18em] text-white/70"
+                className="mt-1 text-[9px] uppercase tracking-[0.14em] text-white/70 sm:mt-2 sm:text-[10px] sm:tracking-[0.18em]"
                 aria-hidden="true"
               >
                 {label}

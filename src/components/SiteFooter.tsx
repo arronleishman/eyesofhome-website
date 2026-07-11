@@ -12,26 +12,26 @@ export function SiteFooter({
   return (
     <footer
       aria-label="Site footer"
-      className="border-t border-white/10 bg-black px-5 py-16"
+      className="border-t border-white/10 bg-black px-4 py-12 pb-[max(3rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-16 lg:px-8"
     >
-      <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+      <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1.1fr_0.9fr] md:items-end md:gap-10">
         <div>
-          <div className="relative mb-8 aspect-[16/10] overflow-hidden border border-white/10">
+          <div className="relative mb-6 aspect-[16/10] overflow-hidden border border-white/10 sm:mb-8">
             <Image
               src="/photos/live-band.jpg"
               alt="Eyes of Home performing live under blue stage lights"
               fill
-              className="object-cover grayscale contrast-125"
-              sizes="(max-width: 1024px) 100vw, 55vw"
+              className="object-cover object-center grayscale contrast-125"
+              sizes="(max-width: 768px) 100vw, 55vw"
             />
           </div>
-          <div className="relative h-10 w-[220px] sm:h-12 sm:w-[280px]">
+          <div className="relative h-8 w-[180px] sm:h-12 sm:w-[280px]">
             <Image
               src="/logo.png"
               alt="Eyes of Home"
               fill
               className="object-contain object-left"
-              sizes="280px"
+              sizes="(max-width: 640px) 180px, 280px"
             />
           </div>
         </div>
@@ -43,7 +43,7 @@ export function SiteFooter({
               href={siteConfig.merchUrl}
               event="merch_click"
               aria-label="Shop Eyes of Home merch on Teemill"
-              className="mt-2 inline-block text-lg text-white underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="mt-2 inline-flex min-h-11 items-center text-base text-white underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:text-lg"
             >
               Shop Teemill
             </TrackedLink>
@@ -56,19 +56,22 @@ export function SiteFooter({
               event="booking_click"
               external={false}
               aria-label={`Email booking at ${siteConfig.bookingEmail}`}
-              className="mt-2 inline-block text-lg text-white underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="mt-2 inline-flex min-h-11 max-w-full items-center break-all text-base text-white underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:break-normal sm:text-lg"
             >
               {siteConfig.bookingEmail}
             </TrackedLink>
           </div>
 
-          <nav aria-label="Social links" className="flex flex-wrap gap-5 text-xs uppercase tracking-[0.16em] text-white/75">
+          <nav
+            aria-label="Social links"
+            className="flex flex-wrap gap-x-5 gap-y-3 text-xs uppercase tracking-[0.16em] text-white/75"
+          >
             {instagramUrl ? (
               <a
                 href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer me"
-                className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                className="inline-flex min-h-11 items-center hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
               >
                 Instagram
                 <span className="sr-only"> (opens in a new tab)</span>
@@ -79,7 +82,7 @@ export function SiteFooter({
                 href={spotifyUrl}
                 event="spotify_click"
                 aria-label="Eyes of Home on Spotify"
-                className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                className="inline-flex min-h-11 items-center hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
               >
                 Spotify
               </TrackedLink>
@@ -88,7 +91,7 @@ export function SiteFooter({
               href={siteConfig.stageRisePublicUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              className="inline-flex min-h-11 items-center hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
               StageRise
               <span className="sr-only"> (opens in a new tab)</span>
