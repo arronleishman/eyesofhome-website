@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useId, useState } from "react";
 import { HeaderMerchLink } from "./HeaderMerchLink";
+import { Wordmark } from "./Wordmark";
 
 const links = [
   { href: "#gigs", label: "Tickets" },
@@ -38,18 +38,11 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
         <a
           href="#top"
-          className="relative block h-6 w-[132px] shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:h-8 sm:w-[190px]"
+          className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
           aria-label="Eyes of Home — back to top"
           onClick={close}
         >
-          <Image
-            src="/logo.png"
-            alt=""
-            fill
-            priority
-            className="object-contain object-left"
-            sizes="(max-width: 640px) 132px, 190px"
-          />
+          <Wordmark size="md" />
         </a>
 
         <nav

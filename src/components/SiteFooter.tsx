@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { siteConfig } from "@/lib/config";
 import { TrackedLink } from "./TrackedLink";
+import { Wordmark } from "./Wordmark";
 
 export function SiteFooter({
   instagramUrl,
@@ -25,15 +26,7 @@ export function SiteFooter({
               sizes="(max-width: 768px) 100vw, 55vw"
             />
           </div>
-          <div className="relative h-8 w-[180px] sm:h-12 sm:w-[280px]">
-            <Image
-              src="/logo.png"
-              alt="Eyes of Home"
-              fill
-              className="object-contain object-left"
-              sizes="(max-width: 640px) 180px, 280px"
-            />
-          </div>
+          <Wordmark size="lg" />
         </div>
 
         <div className="space-y-6">
