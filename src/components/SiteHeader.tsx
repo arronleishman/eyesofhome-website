@@ -35,53 +35,55 @@ export function SiteHeader() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-black/85 backdrop-blur-md pt-[env(safe-area-inset-top)]">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
-        <a
-          href="#top"
-          className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-          aria-label="Eyes of Home — back to top"
-          onClick={close}
-        >
-          <Wordmark size="md" />
-        </a>
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 py-3 sm:py-4">
+          <a
+            href="#top"
+            className="shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            aria-label="Eyes of Home — back to top"
+            onClick={close}
+          >
+            <Wordmark size="header" />
+          </a>
 
-        <nav
-          aria-label="Primary"
-          className="hidden items-center gap-6 text-xs uppercase tracking-[0.16em] text-white/85 md:flex lg:gap-8"
-        >
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="min-h-11 inline-flex items-center transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-            >
-              {link.label}
-            </a>
-          ))}
-          <HeaderMerchLink className="min-h-11 inline-flex items-center" />
-        </nav>
+          <nav
+            aria-label="Primary"
+            className="hidden items-center gap-6 text-xs uppercase tracking-[0.16em] text-white/85 md:flex lg:gap-8"
+          >
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="min-h-11 inline-flex items-center transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+              >
+                {link.label}
+              </a>
+            ))}
+            <HeaderMerchLink className="min-h-11 inline-flex items-center" />
+          </nav>
 
-        <button
-          type="button"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center border border-white/30 text-white md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-          aria-expanded={open}
-          aria-controls={menuId}
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
-          <span aria-hidden="true" className="flex w-5 flex-col gap-1.5">
-            <span
-              className={`block h-0.5 w-full bg-white transition ${open ? "translate-y-2 rotate-45" : ""}`}
-            />
-            <span
-              className={`block h-0.5 w-full bg-white transition ${open ? "opacity-0" : ""}`}
-            />
-            <span
-              className={`block h-0.5 w-full bg-white transition ${open ? "-translate-y-2 -rotate-45" : ""}`}
-            />
-          </span>
-        </button>
+          <button
+            type="button"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center border border-white/30 text-white md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+            aria-expanded={open}
+            aria-controls={menuId}
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
+            <span aria-hidden="true" className="flex w-5 flex-col gap-1.5">
+              <span
+                className={`block h-0.5 w-full bg-white transition ${open ? "translate-y-2 rotate-45" : ""}`}
+              />
+              <span
+                className={`block h-0.5 w-full bg-white transition ${open ? "opacity-0" : ""}`}
+              />
+              <span
+                className={`block h-0.5 w-full bg-white transition ${open ? "-translate-y-2 -rotate-45" : ""}`}
+              />
+            </span>
+          </button>
+        </div>
       </div>
 
       <div
@@ -91,7 +93,7 @@ export function SiteHeader() {
       >
         <nav
           aria-label="Mobile"
-          className="mx-auto flex max-w-6xl flex-col px-4 py-4 sm:px-6"
+          className="mx-auto flex w-full max-w-6xl flex-col px-4 py-4 sm:px-6 lg:px-8"
         >
           {links.map((link) => (
             <a
