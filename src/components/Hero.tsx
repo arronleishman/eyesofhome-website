@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 const FIRST_VIDEO_ID = "W8kTvroE-1c";
 const SECOND_VIDEO_ID = "FB-EFu_AUao";
 const FIRST_START_SECONDS = 132; // 2:12
+/** YouTube flashes play/pause chrome on start; keep poster up until it clears. */
+const REVEAL_DELAY_MS = 2500;
 
 type YtPlayer = {
   destroy: () => void;
@@ -21,7 +23,12 @@ type YtNamespace = {
     element: HTMLElement | string,
     options: Record<string, unknown>,
   ) => YtPlayer;
-  PlayerState: { ENDED: number; PLAYING: number; BUFFERING: number };
+  PlayerState: {
+    ENDED: number;
+    PLAYING: number;
+    BUFFERING: number;
+    PAUSED: number;
+  };
 };
 
 declare global {
@@ -66,7 +73,8 @@ export function Hero() {
   const mountRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YtPlayer | null>(null);
   const switchedRef = useRef(false);
-  const [playing, setPlaying] = useState(false);
+  const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [videoVisible, setVideoVisible] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -80,6 +88,25 @@ export function Hero() {
   useEffect(() => {
     if (reducedMotion) return;
     let cancelled = false;
+
+    function clearRevealTimer() {
+      if (revealTimerRef.current) {
+        clearTimeout(revealTimerRef.current);
+        revealTimerRef.current = null;
+      }
+    }
+
+    function hideVideoChrome() {
+      clearRevealTimer();
+      setVideoVisible(false);
+    }
+
+    function scheduleVideoReveal() {
+      clearRevealTimer();
+      revealTimerRef.current = setTimeout(() => {
+        if (!cancelled) setVideoVisible(true);
+      }, REVEAL_DELAY_MS);
+    }
 
     async function setup() {
       await loadYouTubeApi();
@@ -109,21 +136,25 @@ export function Hero() {
           },
           onStateChange: (event: { data: number; target: YtPlayer }) => {
             if (!window.YT || cancelled) return;
+            const { PLAYING, PAUSED, BUFFERING, ENDED } = window.YT.PlayerState;
 
-            if (event.data === window.YT.PlayerState.PLAYING) {
+            if (event.data === PLAYING) {
               keepSilentAndCaptionless(event.target);
-              setPlaying(true);
+              scheduleVideoReveal();
             }
 
-            if (
-              event.data === window.YT.PlayerState.BUFFERING ||
-              event.data === window.YT.PlayerState.ENDED
-            ) {
-              // Cover YouTube chrome (pause/loading icons) during transitions
-              setPlaying(false);
+            if (event.data === PAUSED) {
+              hideVideoChrome();
+              keepSilentAndCaptionless(event.target);
+              event.target.playVideo();
             }
 
-            if (event.data === window.YT.PlayerState.ENDED) {
+            if (event.data === BUFFERING) {
+              // Keep current visibility; don't flash poster mid-playback
+            }
+
+            if (event.data === ENDED) {
+              hideVideoChrome();
               if (!switchedRef.current) {
                 switchedRef.current = true;
               }
@@ -140,6 +171,7 @@ export function Hero() {
 
     return () => {
       cancelled = true;
+      clearRevealTimer();
       try {
         playerRef.current?.destroy();
       } catch {
@@ -167,9 +199,14 @@ export function Hero() {
           />
         ) : (
           <>
+            {/* Player stays mounted underneath; poster covers YouTube chrome */}
             <div
-              className={`hero-video-frame absolute inset-0 overflow-hidden transition-opacity duration-500 ${playing ? "opacity-100" : "opacity-0"}`}
-              aria-hidden={!playing}
+              className="hero-video-frame absolute inset-0 overflow-hidden"
+              style={{
+                opacity: videoVisible ? 1 : 0,
+                visibility: videoVisible ? "visible" : "hidden",
+              }}
+              aria-hidden={!videoVisible}
             >
               <div
                 ref={mountRef}
@@ -177,19 +214,24 @@ export function Hero() {
                 title="Eyes of Home live performance video"
               />
             </div>
-            <Image
-              src="/photos/hero-kick.jpg"
-              alt=""
-              fill
-              priority
+
+            <div
+              className={`absolute inset-0 z-[1] transition-opacity duration-700 ${videoVisible ? "pointer-events-none opacity-0" : "opacity-100"}`}
               aria-hidden="true"
-              className={`object-cover object-[center_35%] grayscale contrast-125 transition-opacity duration-500 sm:object-center ${playing ? "opacity-0" : "opacity-100"}`}
-              sizes="100vw"
-            />
+            >
+              <Image
+                src="/photos/hero-kick.jpg"
+                alt=""
+                fill
+                priority
+                className="object-cover object-[center_35%] grayscale contrast-125 sm:object-center"
+                sizes="100vw"
+              />
+            </div>
           </>
         )}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/30" />
-        <div className="pointer-events-none absolute inset-0 bg-black/20 mix-blend-multiply" />
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-black via-black/55 to-black/30" />
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-black/20 mix-blend-multiply" />
       </div>
 
       <div className="relative z-10 w-full px-4 pb-[max(4rem,env(safe-area-inset-bottom))] pt-24 sm:px-6 sm:pb-20 sm:pt-28 lg:px-8">

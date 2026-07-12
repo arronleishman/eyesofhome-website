@@ -91,8 +91,7 @@ iframe {
   height: 56.25vw;
   min-width: 177.78vh;
   min-height: 100%;
-  /* Slight overscale crops YouTube center chrome (play/pause) */
-  transform: translate(-50%, -50%) scale(1.18);
+  transform: translate(-50%, -50%) scale(1.12);
   border: 0;
 }
 
