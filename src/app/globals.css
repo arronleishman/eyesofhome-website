@@ -79,6 +79,7 @@ iframe {
 
 .hero-video-frame {
   pointer-events: none;
+  z-index: 0;
 }
 
 .hero-video-player,
@@ -90,7 +91,8 @@ iframe {
   height: 56.25vw;
   min-width: 177.78vh;
   min-height: 100%;
-  transform: translate(-50%, -50%);
+  /* Slight overscale crops YouTube center chrome (play/pause) */
+  transform: translate(-50%, -50%) scale(1.18);
   border: 0;
 }
 

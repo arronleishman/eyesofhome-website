@@ -21,7 +21,7 @@ type YtNamespace = {
     element: HTMLElement | string,
     options: Record<string, unknown>,
   ) => YtPlayer;
-  PlayerState: { ENDED: number; PLAYING: number };
+  PlayerState: { ENDED: number; PLAYING: number; BUFFERING: number };
 };
 
 declare global {
@@ -66,7 +66,7 @@ export function Hero() {
   const mountRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YtPlayer | null>(null);
   const switchedRef = useRef(false);
-  const [ready, setReady] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -106,13 +106,23 @@ export function Hero() {
             if (cancelled) return;
             keepSilentAndCaptionless(event.target);
             event.target.playVideo();
-            setReady(true);
           },
           onStateChange: (event: { data: number; target: YtPlayer }) => {
-            if (!window.YT) return;
+            if (!window.YT || cancelled) return;
+
             if (event.data === window.YT.PlayerState.PLAYING) {
               keepSilentAndCaptionless(event.target);
+              setPlaying(true);
             }
+
+            if (
+              event.data === window.YT.PlayerState.BUFFERING ||
+              event.data === window.YT.PlayerState.ENDED
+            ) {
+              // Cover YouTube chrome (pause/loading icons) during transitions
+              setPlaying(false);
+            }
+
             if (event.data === window.YT.PlayerState.ENDED) {
               if (!switchedRef.current) {
                 switchedRef.current = true;
@@ -157,25 +167,28 @@ export function Hero() {
           />
         ) : (
           <>
-            <Image
-              src="/photos/hero-kick.jpg"
-              alt=""
-              fill
-              priority
-              aria-hidden="true"
-              className={`object-cover object-[center_35%] grayscale contrast-125 transition-opacity duration-700 sm:object-center ${ready ? "opacity-0" : "opacity-100"}`}
-              sizes="100vw"
-            />
-            <div className="hero-video-frame absolute inset-0 overflow-hidden">
+            <div
+              className={`hero-video-frame absolute inset-0 overflow-hidden transition-opacity duration-500 ${playing ? "opacity-100" : "opacity-0"}`}
+              aria-hidden={!playing}
+            >
               <div
                 ref={mountRef}
                 className="hero-video-player"
                 title="Eyes of Home live performance video"
               />
             </div>
+            <Image
+              src="/photos/hero-kick.jpg"
+              alt=""
+              fill
+              priority
+              aria-hidden="true"
+              className={`object-cover object-[center_35%] grayscale contrast-125 transition-opacity duration-500 sm:object-center ${playing ? "opacity-0" : "opacity-100"}`}
+              sizes="100vw"
+            />
           </>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/30" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/30" />
         <div className="pointer-events-none absolute inset-0 bg-black/20 mix-blend-multiply" />
       </div>
 
