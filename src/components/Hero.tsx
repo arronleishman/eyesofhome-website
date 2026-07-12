@@ -10,10 +10,10 @@ const FIRST_START_SECONDS = 132; // 2:12
 type YtPlayer = {
   destroy: () => void;
   mute: () => void;
-  unMute: () => void;
-  isMuted: () => boolean;
   playVideo: () => void;
   loadVideoById: (opts: { videoId: string; startSeconds?: number }) => void;
+  unloadModule?: (module: string) => void;
+  setOption?: (module: string, option: string, value: unknown) => void;
 };
 
 type YtNamespace = {
@@ -51,13 +51,22 @@ function loadYouTubeApi() {
   });
 }
 
+function keepSilentAndCaptionless(player: YtPlayer) {
+  player.mute();
+  try {
+    player.unloadModule?.("captions");
+    player.unloadModule?.("cc");
+    player.setOption?.("captions", "track", {});
+  } catch {
+    // Caption APIs are best-effort depending on player build
+  }
+}
+
 export function Hero() {
   const mountRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YtPlayer | null>(null);
   const switchedRef = useRef(false);
-  const mutedRef = useRef(true);
   const [ready, setReady] = useState(false);
-  const [muted, setMuted] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -85,6 +94,7 @@ export function Hero() {
           controls: 0,
           disablekb: 1,
           fs: 0,
+          cc_load_policy: 0,
           iv_load_policy: 3,
           modestbranding: 1,
           playsinline: 1,
@@ -94,19 +104,21 @@ export function Hero() {
         events: {
           onReady: (event: { target: YtPlayer }) => {
             if (cancelled) return;
-            event.target.mute();
+            keepSilentAndCaptionless(event.target);
             event.target.playVideo();
             setReady(true);
           },
           onStateChange: (event: { data: number; target: YtPlayer }) => {
             if (!window.YT) return;
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              keepSilentAndCaptionless(event.target);
+            }
             if (event.data === window.YT.PlayerState.ENDED) {
               if (!switchedRef.current) {
                 switchedRef.current = true;
               }
               event.target.loadVideoById({ videoId: SECOND_VIDEO_ID });
-              if (mutedRef.current) event.target.mute();
-              else event.target.unMute();
+              keepSilentAndCaptionless(event.target);
               event.target.playVideo();
             }
           },
@@ -126,20 +138,6 @@ export function Hero() {
       playerRef.current = null;
     };
   }, [reducedMotion]);
-
-  function toggleMute() {
-    const player = playerRef.current;
-    if (!player) return;
-    if (player.isMuted()) {
-      player.unMute();
-      mutedRef.current = false;
-      setMuted(false);
-    } else {
-      player.mute();
-      mutedRef.current = true;
-      setMuted(true);
-    }
-  }
 
   return (
     <section
@@ -199,16 +197,6 @@ export function Hero() {
             >
               Listen
             </a>
-            {!reducedMotion ? (
-              <button
-                type="button"
-                onClick={toggleMute}
-                className="inline-flex min-h-12 w-full items-center justify-center border border-white/40 px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:border-white hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:w-auto"
-                aria-pressed={!muted}
-              >
-                {muted ? "Unmute video" : "Mute video"}
-              </button>
-            ) : null}
           </div>
         </div>
       </div>
