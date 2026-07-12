@@ -1,6 +1,146 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+
+const FIRST_VIDEO_ID = "W8kTvroE-1c";
+const SECOND_VIDEO_ID = "FB-EFu_AUao";
+const FIRST_START_SECONDS = 132; // 2:12
+
+type YtPlayer = {
+  destroy: () => void;
+  mute: () => void;
+  unMute: () => void;
+  isMuted: () => boolean;
+  playVideo: () => void;
+  loadVideoById: (opts: { videoId: string; startSeconds?: number }) => void;
+};
+
+type YtNamespace = {
+  Player: new (
+    element: HTMLElement | string,
+    options: Record<string, unknown>,
+  ) => YtPlayer;
+  PlayerState: { ENDED: number; PLAYING: number };
+};
+
+declare global {
+  interface Window {
+    YT?: YtNamespace;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+function loadYouTubeApi() {
+  if (typeof window === "undefined") return Promise.resolve();
+  if (window.YT?.Player) return Promise.resolve();
+
+  return new Promise<void>((resolve) => {
+    const previous = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      previous?.();
+      resolve();
+    };
+
+    if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.async = true;
+      document.body.appendChild(tag);
+    }
+  });
+}
 
 export function Hero() {
+  const mountRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<YtPlayer | null>(null);
+  const switchedRef = useRef(false);
+  const mutedRef = useRef(true);
+  const [ready, setReady] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(media.matches);
+    const onChange = () => setReducedMotion(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    let cancelled = false;
+
+    async function setup() {
+      await loadYouTubeApi();
+      if (cancelled || !mountRef.current || !window.YT?.Player) return;
+
+      playerRef.current = new window.YT.Player(mountRef.current, {
+        videoId: FIRST_VIDEO_ID,
+        host: "https://www.youtube-nocookie.com",
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+          start: FIRST_START_SECONDS,
+        },
+        events: {
+          onReady: (event: { target: YtPlayer }) => {
+            if (cancelled) return;
+            event.target.mute();
+            event.target.playVideo();
+            setReady(true);
+          },
+          onStateChange: (event: { data: number; target: YtPlayer }) => {
+            if (!window.YT) return;
+            if (event.data === window.YT.PlayerState.ENDED) {
+              if (!switchedRef.current) {
+                switchedRef.current = true;
+              }
+              event.target.loadVideoById({ videoId: SECOND_VIDEO_ID });
+              if (mutedRef.current) event.target.mute();
+              else event.target.unMute();
+              event.target.playVideo();
+            }
+          },
+        },
+      });
+    }
+
+    void setup();
+
+    return () => {
+      cancelled = true;
+      try {
+        playerRef.current?.destroy();
+      } catch {
+        // ignore destroy race
+      }
+      playerRef.current = null;
+    };
+  }, [reducedMotion]);
+
+  function toggleMute() {
+    const player = playerRef.current;
+    if (!player) return;
+    if (player.isMuted()) {
+      player.unMute();
+      mutedRef.current = false;
+      setMuted(false);
+    } else {
+      player.mute();
+      mutedRef.current = true;
+      setMuted(true);
+    }
+  }
+
   return (
     <section
       id="top"
@@ -8,15 +148,37 @@ export function Hero() {
       className="relative flex min-h-[100svh] items-end overflow-hidden bg-black"
     >
       <div className="absolute inset-0">
-        <Image
-          src="/photos/hero-kick.jpg"
-          alt="Eyes of Home performing live — kick drum with the band name on stage"
-          fill
-          priority
-          className="object-cover object-[center_35%] grayscale contrast-125 hero-pan sm:object-center"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/35" />
+        {reducedMotion ? (
+          <Image
+            src="/photos/hero-kick.jpg"
+            alt="Eyes of Home performing live — kick drum with the band name on stage"
+            fill
+            priority
+            className="object-cover object-[center_35%] grayscale contrast-125 sm:object-center"
+            sizes="100vw"
+          />
+        ) : (
+          <>
+            <Image
+              src="/photos/hero-kick.jpg"
+              alt=""
+              fill
+              priority
+              aria-hidden="true"
+              className={`object-cover object-[center_35%] grayscale contrast-125 transition-opacity duration-700 sm:object-center ${ready ? "opacity-0" : "opacity-100"}`}
+              sizes="100vw"
+            />
+            <div className="hero-video-frame absolute inset-0 overflow-hidden">
+              <div
+                ref={mountRef}
+                className="hero-video-player"
+                title="Eyes of Home live performance video"
+              />
+            </div>
+          </>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/30" />
+        <div className="pointer-events-none absolute inset-0 bg-black/20 mix-blend-multiply" />
       </div>
 
       <div className="relative z-10 w-full px-4 pb-[max(4rem,env(safe-area-inset-bottom))] pt-24 sm:px-6 sm:pb-20 sm:pt-28 lg:px-8">
@@ -24,7 +186,7 @@ export function Hero() {
           <h1 className="sr-only">
             Eyes of Home — indie rock band from Edinburgh, Scotland
           </h1>
-          <div className="flex w-full flex-col gap-3 fade-up sm:flex-row sm:flex-wrap">
+          <div className="flex w-full flex-col gap-3 fade-up sm:flex-row sm:flex-wrap sm:items-center">
             <a
               href="#gigs"
               className="inline-flex min-h-12 w-full items-center justify-center border border-white bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-transparent hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:w-auto"
@@ -37,6 +199,16 @@ export function Hero() {
             >
               Listen
             </a>
+            {!reducedMotion ? (
+              <button
+                type="button"
+                onClick={toggleMute}
+                className="inline-flex min-h-12 w-full items-center justify-center border border-white/40 px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:border-white hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:w-auto"
+                aria-pressed={!muted}
+              >
+                {muted ? "Unmute video" : "Mute video"}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
