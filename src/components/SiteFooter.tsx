@@ -20,9 +20,9 @@ export function SiteFooter({
           <div className="relative mb-6 aspect-[16/10] overflow-hidden border border-white/10 sm:mb-8">
             <Image
               src="/photos/live-band.jpg"
-              alt="Eyes of Home performing live under blue stage lights"
+              alt="Eyes of Home performing live under red stage lights"
               fill
-              className="object-cover object-center grayscale contrast-125"
+              className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 55vw"
             />
           </div>
