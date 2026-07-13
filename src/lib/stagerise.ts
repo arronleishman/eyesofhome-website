@@ -51,12 +51,16 @@ function asGig(raw: Record<string, unknown>): StageRiseGig | null {
   };
 }
 
+function gigSortKey(gig: StageRiseGig) {
+  return `${gig.date}T${gig.startTime ?? "00:00"}`;
+}
+
+function sortByDateAsc(gigs: StageRiseGig[]) {
+  return [...gigs].sort((a, b) => gigSortKey(a).localeCompare(gigSortKey(b)));
+}
+
 function sortByDateDesc(gigs: StageRiseGig[]) {
-  return [...gigs].sort((a, b) => {
-    const aKey = `${a.date}T${a.startTime ?? "00:00"}`;
-    const bKey = `${b.date}T${b.startTime ?? "00:00"}`;
-    return bKey.localeCompare(aKey);
-  });
+  return [...gigs].sort((a, b) => gigSortKey(b).localeCompare(gigSortKey(a)));
 }
 
 export async function fetchPublicBand(): Promise<PublicBandPayload> {
@@ -77,12 +81,14 @@ export async function fetchPublicBand(): Promise<PublicBandPayload> {
     published?: boolean;
   };
 
-  const upcoming = sortByDateDesc(
+  // Upcoming: soonest first (drives countdown + list order)
+  const upcoming = sortByDateAsc(
     (data.upcoming ?? data.gigs ?? [])
       .map((g) => asGig(g))
       .filter((g): g is StageRiseGig => Boolean(g && g.date)),
   );
 
+  // Past: most recent first
   const past = sortByDateDesc(
     (data.past ?? [])
       .map((g) => asGig(g))
