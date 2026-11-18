@@ -6,6 +6,7 @@ import { NextGig } from "@/components/NextGig";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrackPageView } from "@/components/TrackPageView";
+import { MailingSignup } from "@/components/MailingSignup";
 import { siteConfig } from "@/lib/config";
 import {
   fetchPublicBand,
@@ -45,6 +46,7 @@ export default async function HomePage() {
         <GigsSection upcoming={upcoming} past={past} />
         <ListenSection spotifyUrl={spotifyUrl} artistId={artistId} />
         <AboutSection />
+        <MailingSignup />
       </main>
       <SiteFooter instagramUrl={instagramUrl} spotifyUrl={spotifyUrl} />
     </>
